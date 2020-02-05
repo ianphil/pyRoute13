@@ -2,5 +2,5 @@ from invoke import task
 
 
 @task
-def update(c):
-    c.run('pip freeze > requirements.txt')
+def black(c):
+    c.run('black -l 88 pyRoute13 tests')
