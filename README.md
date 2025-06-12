@@ -1,77 +1,167 @@
 # pyRoute13
-Port of [route13](https://github.com/MikeHopcroft/route13)
 
-A framework for building simulators and optimizers for transportation networks
+Python port of [Route13](https://github.com/MikeHopcroft/route13) - a framework for building simulators and optimizers for transportation networks.
 
-# Route13 
+## Overview
 
-[![Build Status](https://travis-ci.com/MikeHopcroft/route13.svg?branch=master)](https://travis-ci.com/MikeHopcroft/route13)
-[![npm version](https://badge.fury.io/js/route13.svg)](https://badge.fury.io/js/route13)
+`pyRoute13` is a Python framework for building simulators and optimizers for transportation networks. It includes a number of naive, brute-force and heuristics based optimizers, but its pluggable architecture allows the use of more sophisticated optimizers, such as [linear programming solvers](https://en.wikipedia.org/wiki/Linear_programming) and ML models. 
 
-`Route13` is a framework for building simulators and optimizers for transportation networks. `Route13` includes a number of naive, brute-force and heuristics based optimizers, but its pluggable architecture allows the use of more sophisticated optimizers, such as 
-[linear programming solvers](https://en.wikipedia.org/wiki/Linear_programming)
-and ML models. `Route13` scenarios include forklifts in warehouses, baggage carts at airports, and trucks on highways. Basically anything that involves workers or equipment moving loads over a network while satisfying constraints around delivery times, equipment capacities, and worker schedules.
+`pyRoute13` scenarios include forklifts in warehouses, baggage carts at airports, and trucks on highways. Basically anything that involves workers or equipment moving loads over a network while satisfying constraints around delivery times, equipment capacities, and worker schedules.
 
-For information on how `Route13` works, please see our
-[design documents](https://github.com/MikeHopcroft/route13/blob/master/documentation/README.md).
+### Key Features
 
-## Try Route13
+- **Coroutine-based discrete event simulation** using Python generators
+- **Pluggable optimizers** for route planning and job assignment
+- **Flexible agent system** for modeling complex behaviors
+- **Time-based simulation** with priority queue scheduling
 
-`Route13` is a [Node.js](https://nodejs.org/en/) project,
-written in [TypeScript](https://www.typescriptlang.org/).
-In order to use `Route13` you must have
-[Node installed](https://nodejs.org/en/download/) on your machine.
-`Route13` has been tested with Node version 10.15.3.
+## Installation
 
-`Route13` is be available as an [npm package](https://www.npmjs.com/package/route13). To install `Route13`,
+### Requirements
 
-~~~
-% npm install route13
-~~~
+- Python 3.6 or higher
+- pip package manager
 
-To run the samples, it is best to build `Route13` from sources. First, clone the [repo](https://github.com/MikeHopcroft/route13):
-~~~
-% git clone https://github.com/MikeHopcroft/route13.git
-~~~
+### Install from source
 
-Then run the following commands from the root of the repo:
+Clone the repository:
+```bash
+git clone https://github.com/ianphil/pyRoute13.git
+cd pyRoute13
+```
 
-~~~
-% cd route13
-% npm install
-% npm run compile
-~~~
+Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-Unit tests are based on [Mocha](https://www.npmjs.com/package/mocha) and 
-[Chai](https://www.npmjs.com/package/chai) and can be run with
-~~~
-% npm run test
-~~~
-### Running the Samples
+## Usage
 
-`Route13` provides a number of [sample applications](./samples/README.md) that demonstrate various aspects of configuring and running simulations and optimizers.
+### Running the Examples
 
-* [Hello Route13](./documentation/samples/hello-route13.md) - shows how to configure and run a basic simulation.
-* [Route Planning](./documentation/samples/route-planner.md) - demonstrates how to find the optimal route for a single `Cart` to perform a set of `Jobs`.
-* [Graph](./documentation/samples/graph.md) - demonstrates the use of the [Floyd-Warshall algorithm](https://en.wikipedia.org/wiki/Floyd%E2%80%93Warshall_algorithm)
- to find shortest paths and estimate travel times.
-* [Job Assignment](./documentation/samples/job-assignment.md) - demonstrates use of a brute-force optimizer to assign a of `Jobs` to a pool of `Carts`.
-* [Staffing Generator](./documentation/samples/staffing-generator.md) - example of a synthetic generator that produces `OutOfService` events
-for a hypothetical workforce, consisting of multiple crews, each working a
-specific shift.
-* [Transfer Generator](./documentation/samples/transfer-generator.md) - example of a synthetic generator that produces `TransferJob` events
-for a synthetic schedule of random arrivals and departures.
-* [Full Route13](./documentation/samples/full-route13.md) - simulates operations during a 24 hour period using 52 synthetic `TransferJobs`.
+`pyRoute13` provides several example simulations that demonstrate the framework's capabilities:
 
-## Route13 Applications
+```bash
+# Run the simple simulator (3 carts, 4 jobs)
+invoke simple
 
-Section coming soon.
+# Run the full simulator (24-hour simulation)
+invoke full
+```
 
-## Using Route13
+You can also run the examples directly:
+```bash
+python pyRoute13/simple_simulator.py
+python pyRoute13/full_simulator.py
+```
 
-Section coming soon. For now, please see our 
-[design documents](https://github.com/MikeHopcroft/route13/blob/master/documentation/README.md).
+### Development Commands
 
-## Contributing to Route13.
+This project uses [invoke](http://www.pyinvoke.org/) for task management:
 
-Section coming soon.
+```bash
+# Format code with Black (88 character line length)
+invoke black
+
+# Run tests with coverage
+invoke test
+
+# Run simple simulation demo
+invoke simple
+
+# Run full simulation demo  
+invoke full
+```
+
+### Running Tests
+
+Tests use nose as the test runner with coverage reporting:
+
+```bash
+# Run all tests
+invoke test
+
+# Run a specific test file
+nosetests tests/unit_tests/test_agent.py
+```
+
+## Architecture
+
+`pyRoute13` uses a coroutine-based architecture where agents (entities that perform actions) are implemented as Python generators that yield scheduling functions to a central timeline. This allows complex sequential behaviors to be written as simple, readable code.
+
+### Core Components
+
+- **Timeline**: Manages simulation time and schedules agent execution
+- **Agents**: Entities that perform actions over time (drivers, dispatchers)
+- **Environment**: Manages the simulation world (carts, jobs, locations)
+- **Planners**: Optimize routes and job assignments
+- **Generators**: Create synthetic workloads and schedules
+
+For a detailed explanation of the coroutine architecture, see the [Coroutine Simulation Tutorial](docs/coroutine_simulation_tutorial.md).
+
+## Project Structure
+
+```
+pyRoute13/
+├── pyRoute13/
+│   ├── api/
+│   │   ├── core/          # Core simulation components
+│   │   ├── agents/        # Agent implementations
+│   │   ├── environment/   # Simulation world modeling
+│   │   ├── planner/       # Optimization algorithms
+│   │   └── generators/    # Synthetic data generation
+│   ├── simple_simulator.py
+│   └── full_simulator.py
+├── tests/
+│   ├── unit_tests/
+│   └── integration_tests/
+├── docs/
+│   └── coroutine_simulation_tutorial.md
+└── requirements.txt
+```
+
+## Documentation
+
+- [Coroutine Simulation Tutorial](docs/coroutine_simulation_tutorial.md) - Learn how the coroutine-based simulation engine works
+- [CLAUDE.md](CLAUDE.md) - Development guide for AI assistants
+
+**Note**: This is a Python port of the original TypeScript Route13 project. Some documentation may still reference the TypeScript implementation. For Python-specific details, refer to the source code and the tutorials in the `docs/` directory.
+
+## Examples
+
+### Simple Simulation
+
+The simple simulator demonstrates basic concepts with 3 carts and 4 jobs:
+
+```python
+from pyRoute13.api.core import timeline, agent
+from pyRoute13.api.environment import environment, cart_factory, job_factory
+from pyRoute13.api.agents import simple_dispatcher, driver
+
+# Create core components
+timeline = timeline.Timeline()
+env = environment.Environment(...)
+dispatcher = simple_dispatcher.SimpleDispatcher(timeline, env, trace)
+
+# Add carts
+cart_factory = cart_factory.Cart_Factory()
+for i in range(3):
+    cart = cart_factory.cart(capacity=10, location=0)
+    env.add_cart(cart)
+    agent.start(driver.drive(cart))
+
+# Run simulation
+timeline.main_loop()
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit issues and pull requests.
+
+## License
+
+This project is licensed under the same terms as the original Route13 project. See the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+This is a Python port of the original [Route13](https://github.com/MikeHopcroft/route13) project by Mike Hopcroft.
